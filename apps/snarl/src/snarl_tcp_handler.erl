@@ -158,6 +158,23 @@ message({user, api_token, Realm, User, Scope, Comment}, State) when
      snarl_token:api_token(Realm, User, Scope, Comment),
      State};
 
+message({user, manual_token, Realm, User, Scope, Comment, Token}, State) when
+      is_binary(Realm),
+      is_binary(User),
+      is_list(Scope),
+      (is_binary(Comment) orelse Comment =:= undefined),
+      is_binary(Token) ->
+    TokenID = fifo_utils:uuid(),
+    Expiery = infinity,
+    Client = undefined,
+    Type = access,
+    {reply,
+     snarl_user:add_token(
+       Realm, User, TokenID, Type, Token, Expiery, Client,
+       Scope, Comment),
+     State};
+
+
 message({user, sign_csr, Realm, User, Scope, Comment, CSR}, State) when
       is_binary(Realm),
       is_binary(User),
